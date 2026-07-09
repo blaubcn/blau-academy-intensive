@@ -1,0 +1,1141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blau Language Academy — Book Your Course</title>
+<style>
+  :root {
+    --navy: #1f2a5e;
+    --navy-dark: #16204a;
+    --blue-bg: #a9bbe0;
+    --blue-light: #eef1fb;
+    --blue-mid: #dbe3f6;
+    --card-radius: 28px;
+    --field-radius: 999px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: var(--blue-bg);
+    background-image:
+      radial-gradient(rgba(255,255,255,0.55) 1.5px, transparent 1.5px),
+      radial-gradient(rgba(255,255,255,0.35) 1.5px, transparent 1.5px);
+    background-size: 26px 26px, 26px 26px;
+    background-position: 0 0, 13px 13px;
+    min-height: 100vh;
+    padding: 40px 16px;
+  }
+
+  .booking-wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .booking-wrap { grid-template-columns: 1fr; }
+  }
+
+  .card, .quote-card {
+    background: #fff;
+    border-radius: var(--card-radius);
+    box-shadow: 0 30px 60px -20px rgba(20, 30, 70, 0.35);
+  }
+
+  .card-inner {
+    padding: 36px 36px 30px;
+  }
+
+  .brand {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8f98b8;
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  h2.title {
+    margin: 0 0 26px;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+
+  .indicates-required {
+    font-size: 12px;
+    color: #9aa2bb;
+    margin-bottom: 18px;
+  }
+  .indicates-required .asterisk { color: #e0567a; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 480px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  .mc-field-group {
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .mc-field-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 6px 18px;
+  }
+  .mc-field-group label .asterisk { color: #e0567a; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: var(--field-radius);
+    border: 1.5px solid #e3e7f4;
+    background: var(--blue-light);
+    font-size: 14px;
+    color: var(--navy);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: inherit;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    border-color: var(--navy);
+    background: #fff;
+  }
+  input::placeholder { color: #a7aecb; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%231f2a5e'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 16px;
+    padding-right: 44px;
+    cursor: pointer;
+  }
+  select:invalid { color: #a7aecb; }
+
+  .date-input { cursor: pointer; }
+
+  .calendar-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    width: 280px;
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #e3e7f4;
+    box-shadow: 0 20px 40px -12px rgba(20, 30, 70, 0.35);
+    padding: 16px;
+  }
+  .calendar-popup.open { display: block; }
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .cal-month-label { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .cal-nav {
+    border: none;
+    background: var(--blue-light);
+    color: var(--navy);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .cal-nav:hover { background: var(--blue-mid); }
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #9aa2bb;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    color: #c3c8dc;
+    border-radius: 50%;
+  }
+  .cal-day.empty { visibility: hidden; }
+  .cal-day.enabled {
+    color: var(--navy);
+    font-weight: 700;
+    background: var(--blue-light);
+    cursor: pointer;
+  }
+  .cal-day.enabled:hover { background: var(--navy); color: #fff; }
+  .calendar-hint {
+    margin: 10px 0 0;
+    font-size: 10.5px;
+    color: #9aa2bb;
+    text-align: center;
+  }
+
+  #mergeRow-gdpr {
+    margin-top: 6px;
+    padding: 16px 18px;
+    background: var(--blue-light);
+    border-radius: 20px;
+    font-size: 12px;
+    color: #6a7196;
+    line-height: 1.5;
+  }
+  #mergeRow-gdpr p { margin: 0 0 10px; }
+  #mergeRow-gdpr label {
+    font-size: 12px;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    margin: 0 0 8px;
+  }
+  #mergeRow-gdpr input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    accent-color: var(--navy);
+  }
+  #mergeRow-gdpr a { color: var(--navy); }
+
+  .mce-responses { margin-top: 10px; }
+  #mce-error-response {
+    color: #c23b5a;
+    font-size: 13px;
+    background: #fdecf1;
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+  #mce-success-response {
+    color: #1f7a4d;
+    font-size: 13px;
+    background: #e8f7ee;
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .page1-error {
+    color: #c23b5a;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin: 4px 0 0;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1.5px solid #e3e7f4;
+    color: var(--navy);
+    border-radius: var(--field-radius);
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .back-btn:hover { background: var(--blue-light); }
+
+  .terms-note {
+    font-size: 11px;
+    color: #8f98b8;
+    margin: 14px 0 0;
+  }
+  .terms-note a { color: var(--navy); }
+
+  /* Quote summary sidebar */
+  .quote-card {
+    padding: 24px;
+    position: sticky;
+    top: 20px;
+  }
+  .quote-card h3 {
+    margin: 0 0 14px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6a7196;
+  }
+  .quote-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: #6a7196;
+    padding: 8px 0;
+    border-bottom: 1px solid #eef1fb;
+  }
+  .quote-row strong {
+    color: var(--navy);
+    font-weight: 700;
+    text-align: right;
+  }
+  .quote-total {
+    border-bottom: none;
+    padding-top: 14px;
+    font-size: 14px;
+  }
+  .course-structure {
+    background: var(--blue-light);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 0 0 4px;
+    font-size: 13px;
+    color: #4a5380;
+    line-height: 1.5;
+  }
+  .course-structure-title {
+    margin: 0 0 2px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .course-structure-time {
+    margin: 0 0 6px;
+    color: #6a7196;
+  }
+  .course-structure ul {
+    margin: 0;
+    padding-left: 16px;
+  }
+  .course-structure li { margin-bottom: 2px; }
+  .accom-preview { margin: 0 0 4px; }
+  .accom-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .accom-photo {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: var(--blue-light);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .accom-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .accom-photo-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 3px 6px;
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: linear-gradient(to top, rgba(15, 20, 40, 0.65), transparent);
+  }
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 20, 40, 0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .lightbox-close:hover { background: rgba(255, 255, 255, 0.3); }
+  .accom-details {
+    font-size: 13px;
+    color: #4a5380;
+    line-height: 1.6;
+    background: var(--blue-light);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 0;
+  }
+  .accom-details strong { color: var(--navy); }
+  .floorplan-link {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .quote-total strong {
+    font-size: 24px;
+    font-weight: 800;
+  }
+  .quote-total strong.placeholder {
+    font-size: 14px;
+    color: #9aa2bb;
+    font-weight: 600;
+  }
+  .quote-note {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 8px 0 16px;
+  }
+  .deposit-note {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue-light);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #4a5380;
+  }
+  .deposit-note strong { color: var(--navy); font-weight: 800; }
+  .discount-note {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #dcf3e6;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #1f7a4d;
+  }
+  .discount-note strong { font-weight: 800; }
+  .included-list {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #eef1fb;
+  }
+  .included-title {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6a7196;
+  }
+  .included-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .included-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--navy);
+    padding: 4px 0;
+  }
+  .check-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #1f7a4d;
+    color: #fff;
+    font-size: 9px;
+    line-height: 1;
+  }
+  .quote-cta {
+    width: 100%;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--field-radius);
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.15s ease;
+  }
+  .quote-cta:hover { background: var(--navy-dark); }
+</style>
+</head>
+<body>
+
+<div class="booking-wrap">
+  <div class="card">
+    <div class="card-inner">
+      <p class="brand">Blau Language Academy</p>
+      <h2 class="title" id="page-title">Book Your Course</h2>
+
+      <form
+        action="https://blaustudenthousing.us8.list-manage.com/subscribe/post?u=a508b1d7581df9dd34f531f2f&amp;id=01eba896ed&amp;v_id=3701&amp;f_id=00beeee2f0"
+        method="post"
+        id="mc-embedded-subscribe-form"
+        name="mc-embedded-subscribe-form"
+        class="validate"
+        target="_blank"
+        novalidate
+      >
+        <div id="page-1" class="form-page">
+          <div class="indicates-required"><span class="asterisk">*</span> indicates required</div>
+
+          <div class="mc-field-group">
+            <label for="course-select">Choose Course <span class="asterisk">*</span></label>
+            <select id="course-select" name="MMERGE_COURSE" required>
+              <option value="" selected>Select a course…</option>
+            </select>
+          </div>
+
+          <div class="mc-field-group">
+            <label for="level-select">Choose Level <span class="asterisk">*</span></label>
+            <select id="level-select" name="MMERGE_LEVEL" required>
+              <option value="" selected>Select a level…</option>
+              <option value="Complete Beginner A1">Complete Beginner A1</option>
+              <option value="Beginner A2">Beginner A2</option>
+              <option value="Intermediate B1">Intermediate B1</option>
+              <option value="Advanced B2">Advanced B2</option>
+            </select>
+          </div>
+
+          <div class="mc-field-group">
+            <label for="mce-MMERGE8">Choose Duration <span class="asterisk">*</span></label>
+            <select name="MMERGE8" id="mce-MMERGE8" required>
+              <option value="" selected>Select a duration…</option>
+              <option value="1 Week">1 Week</option>
+              <option value="2 Weeks">2 Weeks</option>
+              <option value="3 Weeks">3 Weeks</option>
+              <option value="4 Weeks">4 Weeks</option>
+              <option value="5 Weeks">5 Weeks</option>
+              <option value="6 Weeks">6 Weeks</option>
+              <option value="7 Weeks">7 Weeks</option>
+              <option value="8 Weeks">8 Weeks</option>
+              <option value="9 Weeks">9 Weeks</option>
+              <option value="10 Weeks">10 Weeks</option>
+              <option value="11 Weeks">11 Weeks</option>
+              <option value="12 Weeks">12 Weeks</option>
+            </select>
+          </div>
+
+          <div class="mc-field-group" id="start-date-group">
+            <label for="start-date-input">Course Start Date <span class="asterisk">*</span></label>
+            <input type="text" id="start-date-input" class="date-input" placeholder="Select a Sunday" readonly autocomplete="off" required>
+            <input type="hidden" name="STARTDATE[day]" id="mce-STARTDATE-day" value="">
+            <input type="hidden" name="STARTDATE[month]" id="mce-STARTDATE-month" value="">
+            <input type="hidden" name="STARTDATE[year]" id="mce-STARTDATE-year" value="">
+            <div class="calendar-popup" id="calendar-popup">
+              <div class="calendar-header">
+                <button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month">‹</button>
+                <span class="cal-month-label" id="cal-month-label"></span>
+                <button type="button" class="cal-nav" id="cal-next" aria-label="Next month">›</button>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div class="calendar-grid" id="calendar-grid"></div>
+              <p class="calendar-hint">Courses start every Monday</p>
+            </div>
+          </div>
+
+          <div class="mc-field-group">
+            <label for="accom-select">Choose Accommodation <span class="asterisk">*</span></label>
+            <select id="accom-select" name="MMERGE_ACCOM" required>
+              <option value="" selected>Select accommodation…</option>
+            </select>
+          </div>
+
+          <div class="mc-field-group" id="accom-date-group">
+            <label for="accom-date-input">Accommodation Start Date <span class="asterisk">*</span></label>
+            <input type="text" id="accom-date-input" class="date-input" placeholder="Select move-in date" readonly autocomplete="off" required>
+            <input type="hidden" name="ACCOMSTART[day]" id="accom-start-day" value="">
+            <input type="hidden" name="ACCOMSTART[month]" id="accom-start-month" value="">
+            <input type="hidden" name="ACCOMSTART[year]" id="accom-start-year" value="">
+            <div class="calendar-popup" id="accom-calendar-popup">
+              <div class="calendar-header">
+                <button type="button" class="cal-nav" id="accom-cal-prev" aria-label="Previous month">‹</button>
+                <span class="cal-month-label" id="accom-cal-month-label"></span>
+                <button type="button" class="cal-nav" id="accom-cal-next" aria-label="Next month">›</button>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div class="calendar-grid" id="accom-calendar-grid"></div>
+              <p class="calendar-hint">1 or 2 days before your course starts</p>
+            </div>
+          </div>
+
+          <div class="mc-field-group">
+            <label for="extra-nights-input">Extra Nights (optional)</label>
+            <input type="number" id="extra-nights-input" min="0" step="1" value="0" placeholder="0">
+            <p class="calendar-hint" id="extra-nights-hint" style="text-align:left;">Select an accommodation to see the extra night rate</p>
+          </div>
+
+          <p class="page1-error" id="page1-error" style="display:none;">Please complete all fields above before continuing.</p>
+        </div>
+
+        <div id="page-2" class="form-page" style="display:none;">
+          <div class="indicates-required"><span class="asterisk">*</span> indicates required</div>
+
+          <div class="field-row">
+            <div class="mc-field-group">
+              <label for="mce-FNAME">First Name <span class="asterisk">*</span></label>
+              <input type="text" name="FNAME" class="required text" id="mce-FNAME" placeholder="First name" required value="">
+            </div>
+            <div class="mc-field-group">
+              <label for="mce-LNAME">Last Name <span class="asterisk">*</span></label>
+              <input type="text" name="LNAME" class="required text" id="mce-LNAME" placeholder="Last name" required value="">
+            </div>
+          </div>
+
+          <div class="mc-field-group">
+            <label for="mce-EMAIL">Email Address <span class="asterisk">*</span></label>
+            <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" required value="">
+          </div>
+
+          <div class="mc-field-group">
+            <label for="mce-COUNTRY">Country <span class="asterisk">*</span></label>
+            <input type="text" name="COUNTRY" class="required text" id="mce-COUNTRY" placeholder="Country" required value="">
+          </div>
+
+          <div id="mergeRow-gdpr" class="mergeRow gdpr-mergeRow content__gdprBlock mc-field-group">
+            <p>Blau Language Academy will use the information you provide on this form to stay in touch with you and to send you information about our classes, events, and promotions.</p>
+            <label for="gdpr_43744">
+              <input type="checkbox" id="gdpr_43744" name="gdpr[43744]" class="gdpr required" value="Y">
+              <span>Email from Blau Language Academy <span class="asterisk">*</span></span>
+            </label>
+            <p style="margin:0;">You can unsubscribe at any time. See our <a href="https://blaustudenthousing.com/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>.</p>
+          </div>
+
+          <button type="button" id="back-btn" class="back-btn">← Back</button>
+
+          <p class="terms-note">By clicking Submit you agree to our <a href="https://blaustudenthousing.com/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy Terms</a></p>
+
+          <div hidden><input type="hidden" name="tags" value="5448547"></div>
+          <div class="mce-responses">
+            <div class="response" id="mce-error-response" style="display: none;"></div>
+            <div class="response" id="mce-success-response" style="display: none;"></div>
+          </div>
+          <div aria-hidden="true" style="position: absolute; left: -5000px;">
+            <input type="text" name="b_a508b1d7581df9dd34f531f2f_01eba896ed" tabindex="-1" value="">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <aside class="quote-card">
+    <h3>Quote Summary</h3>
+    <div class="quote-row"><span>Course</span><strong id="q-course">—</strong></div>
+    <div class="course-structure" id="course-structure" style="display:none;">
+      <p class="course-structure-title">Course Structure — 25h/week</p>
+      <p class="course-structure-time">Mon–Fri · 9:00–13:30 + select afternoons 14:00–16:00</p>
+      <ul>
+        <li><strong>20h</strong> General Spanish (mornings) — grammar, vocab, core skills</li>
+        <li><strong>5h</strong> Communication &amp; Applied Spanish (afternoons) — fluency &amp; speaking practice</li>
+      </ul>
+    </div>
+    <div class="quote-row"><span>Duration</span><strong id="q-duration">—</strong></div>
+    <div class="quote-row"><span>Start Date</span><strong id="q-start">—</strong></div>
+    <div class="quote-row"><span>Accommodation</span><strong id="q-accom">—</strong></div>
+    <div class="accom-preview" id="accom-preview" style="display:none;">
+      <div class="accom-gallery" id="accom-gallery"></div>
+      <a class="floorplan-link" id="floorplan-link" href="#" target="_blank" rel="noopener noreferrer">View floor plan (PDF) ↗</a>
+      <p class="accom-details" id="accom-details"></p>
+    </div>
+    <div class="quote-row"><span>Accommodation Dates</span><strong id="q-accom-start">—</strong></div>
+    <div class="quote-row quote-total"><span>Total</span><strong id="q-total" class="placeholder">Select options above</strong></div>
+    <div class="discount-note" id="discount-note">
+      <span>🎉</span>
+      <span><strong id="discount-percent">—</strong> long-stay discount applied</span>
+    </div>
+    <div class="deposit-note" id="deposit-note">
+      <span>🔒</span>
+      <span>Refundable security deposit: <strong id="deposit-amount">—</strong> (returned after checkout)</span>
+    </div>
+    <p class="quote-note">Tax &amp; utilities included · No hidden fees</p>
+
+    <div class="included-list" id="included-list" style="display:none;">
+      <p class="included-title">Included in the price</p>
+      <ul>
+        <li><span class="check-dot">✓</span>Level and needs assessment</li>
+        <li><span class="check-dot">✓</span>Use of study centre</li>
+        <li><span class="check-dot">✓</span>Weekly cleaning service</li>
+        <li><span class="check-dot">✓</span>Free linen &amp; towels (changed weekly)</li>
+        <li><span class="check-dot">✓</span>Swimming pool access</li>
+        <li><span class="check-dot">✓</span>Gym access</li>
+        <li><span class="check-dot">✓</span>Activity programme</li>
+        <li><span class="check-dot">✓</span>End-of-course report &amp; certificate</li>
+      </ul>
+    </div>
+
+    <button type="button" id="cta-btn" form="mc-embedded-subscribe-form" class="quote-cta">Next →</button>
+  </aside>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script>
+<script>
+  (function ($) {
+    window.fnames = new Array();
+    window.ftypes = new Array();
+    fnames[0] = 'EMAIL'; ftypes[0] = 'email';
+    fnames[1] = 'FNAME'; ftypes[1] = 'text';
+    fnames[2] = 'LNAME'; ftypes[2] = 'text';
+    fnames[5] = 'COUNTRY'; ftypes[5] = 'text';
+    fnames[6] = 'STARTDATE'; ftypes[6] = 'date';
+    fnames[8] = 'MMERGE8'; ftypes[8] = 'dropdown';
+  })(typeof jQuery !== 'undefined' ? jQuery : function () { return { noConflict: function () {} }; });
+
+  /* EDIT THESE when real course prices are ready. Duration keys must match
+     the MMERGE8 option values above. Accommodation is priced per night via
+     each accommodation's nightlyRate below. */
+  var COURSES = [
+    { value: 'intensive-25h', label: '25h Intensive Course' }
+  ];
+  var COURSE_PRICES = {
+    'intensive-25h': {
+      '1 Week': 345, '2 Weeks': 610, '3 Weeks': 875, '4 Weeks': 1140,
+      '5 Weeks': 1355, '6 Weeks': 1610, '7 Weeks': 1865, '8 Weeks': 2120,
+      '9 Weeks': 2375, '10 Weeks': 2630, '11 Weeks': 2885, '12 Weeks': 2900
+    }
+  };
+  var ACCOMMODATIONS = [
+    {
+      value: 'single-studio',
+      label: 'Single Studio',
+      nightlyRate: 50,
+      extraNightRate: 80,
+      photos: [
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-STUSIO-4x3-3.webp', caption: 'Room' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-STUSIO-4x3-5.webp', caption: 'Bathroom' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-STUSIO-4x3-7.webp', caption: 'Kitchen' }
+      ],
+      floorplan: 'https://blaustudenthousing.com/wp-content/uploads/2025/06/SINGLE-STUDIO.pdf',
+      size: '16 m²',
+      bed: '1 single bed',
+      extras: 'Private bathroom & full kitchen'
+    },
+    {
+      value: 'comfort-studio',
+      label: 'Comfort Studio',
+      nightlyRate: 52.5,
+      extraNightRate: 84,
+      photos: [
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/Comfort-7.avif', caption: 'Room' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-ROOM-4x3-19.webp', caption: 'Bathroom' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/Comfort-14.avif', caption: 'Kitchen' }
+      ],
+      floorplan: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/studio-floor-plan-blau-1.pdf',
+      size: '16 m²',
+      bed: '1 double bed',
+      extras: 'Private bathroom & full kitchen'
+    },
+    {
+      value: 'comfort-plus-studio',
+      label: 'Comfort Plus Studio',
+      nightlyRate: 56.25,
+      extraNightRate: 90,
+      photos: [
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2026/06/Render-Frontal-Cama.jpg', caption: 'Room' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-ROOM-4x3-19.webp', caption: 'Bathroom' },
+        { url: 'https://blaustudenthousing.com/wp-content/uploads/2026/06/Render-Vista-Completa.jpg', caption: 'Kitchen' }
+      ],
+      floorplan: 'https://blaustudenthousing.com/wp-content/uploads/2026/06/comfort-plus-floorplan.pdf',
+      size: '16 m²',
+      bed: '1 double bed',
+      extras: 'Private bathroom, full kitchen & in-room washing machine'
+    }
+  ];
+  /* EDIT: accommodation discount tiers, by minimum weeks booked.
+     Use the admin.html page to edit these visually and generate this line. */
+  var DISCOUNT_TIERS = [];
+
+  function weeksFromDuration(durationVal) {
+    return parseInt(durationVal, 10) || 0;
+  }
+
+  function bestDiscountPercent(weeks) {
+    var percent = 0;
+    DISCOUNT_TIERS.forEach(function (tier) {
+      if (weeks >= tier.minWeeks && tier.percent > percent) percent = tier.percent;
+    });
+    return percent;
+  }
+
+  var courseSelect = document.getElementById('course-select');
+  var levelSelect = document.getElementById('level-select');
+  var accomSelect = document.getElementById('accom-select');
+  var durationSelect = document.getElementById('mce-MMERGE8');
+
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightbox-img');
+  var lightboxClose = document.getElementById('lightbox-close');
+
+  function openLightbox(url, caption) {
+    lightboxImg.src = url;
+    lightboxImg.alt = caption;
+    lightbox.classList.add('open');
+  }
+  function closeLightbox() { lightbox.classList.remove('open'); }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  COURSES.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.value;
+    opt.textContent = c.label;
+    courseSelect.appendChild(opt);
+  });
+  ACCOMMODATIONS.forEach(function (a) {
+    var opt = document.createElement('option');
+    opt.value = a.value;
+    opt.textContent = a.label;
+    accomSelect.appendChild(opt);
+  });
+
+  var qCourse = document.getElementById('q-course');
+  var qDuration = document.getElementById('q-duration');
+  var qStart = document.getElementById('q-start');
+  var qAccom = document.getElementById('q-accom');
+  var qAccomStart = document.getElementById('q-accom-start');
+  var qTotal = document.getElementById('q-total');
+  var discountNote = document.getElementById('discount-note');
+  var discountPercentEl = document.getElementById('discount-percent');
+  var depositNote = document.getElementById('deposit-note');
+  var depositAmount = document.getElementById('deposit-amount');
+  var courseStructure = document.getElementById('course-structure');
+  var accomPreview = document.getElementById('accom-preview');
+  var accomGallery = document.getElementById('accom-gallery');
+  var accomDetails = document.getElementById('accom-details');
+  var floorplanLink = document.getElementById('floorplan-link');
+  var includedList = document.getElementById('included-list');
+  var extraNightsInput = document.getElementById('extra-nights-input');
+  var extraNightsHint = document.getElementById('extra-nights-hint');
+
+  function extraNights() {
+    var n = parseInt(extraNightsInput.value, 10);
+    return n > 0 ? n : 0;
+  }
+
+  function updateAccomRangeDisplay() {
+    if (!accomStartInput.value || !accomStartDayEl.value) {
+      qAccomStart.textContent = '—';
+      return;
+    }
+    var nights = weeksFromDuration(durationSelect.value) * 7 + extraNights();
+    if (!nights) {
+      qAccomStart.textContent = accomStartInput.value;
+      return;
+    }
+    var start = new Date(accomStartYearEl.value, accomStartMonthEl.value - 1, accomStartDayEl.value);
+    var end = new Date(start);
+    end.setDate(end.getDate() + nights);
+    qAccomStart.textContent = WEEKDAY_SHORT[start.getDay()] + ' ' + start.getDate() + ' ' + MONTH_NAMES[start.getMonth()].slice(0, 3) +
+      ' → ' + WEEKDAY_SHORT[end.getDay()] + ' ' + end.getDate() + ' ' + MONTH_NAMES[end.getMonth()].slice(0, 3);
+  }
+
+  function updateQuote() {
+    var courseVal = courseSelect.value;
+    var accomVal = accomSelect.value;
+    var durationVal = durationSelect.value;
+
+    var course = COURSES.find(function (c) { return c.value === courseVal; });
+    var accom = ACCOMMODATIONS.find(function (a) { return a.value === accomVal; });
+
+    qCourse.textContent = course ? course.label : '—';
+    qDuration.textContent = durationVal || '—';
+    qAccom.textContent = accom ? accom.label : '—';
+    courseStructure.style.display = courseVal ? 'block' : 'none';
+    includedList.style.display = (courseVal && accomVal) ? 'block' : 'none';
+
+    if (accom) {
+      accomGallery.className = 'accom-gallery count-' + accom.photos.length;
+      accomGallery.innerHTML = accom.photos.map(function (p) {
+        return '<div class="accom-photo"><img src="' + p.url + '" alt="' + p.caption + '" loading="lazy"><span class="accom-photo-caption">' + p.caption + '</span></div>';
+      }).join('');
+      Array.prototype.forEach.call(accomGallery.querySelectorAll('.accom-photo'), function (tile, i) {
+        tile.addEventListener('click', function () { openLightbox(accom.photos[i].url, accom.photos[i].caption); });
+      });
+      accomDetails.innerHTML = '<strong>' + accom.size + '</strong> · ' + accom.bed + '<br>' + accom.extras + '.';
+      floorplanLink.href = accom.floorplan;
+      extraNightsHint.textContent = '€' + accom.extraNightRate + '/night extra · add nights before move-in or after checkout';
+      accomPreview.style.display = 'block';
+    } else {
+      accomPreview.style.display = 'none';
+      extraNightsHint.textContent = 'Select an accommodation to see the extra night rate';
+    }
+
+    var weeks = weeksFromDuration(durationVal);
+    var discountPercent = accomVal ? bestDiscountPercent(weeks) : 0;
+
+    if (courseVal && accomVal && durationVal) {
+      var accomPrice = weeks * 7 * accom.nightlyRate + extraNights() * accom.extraNightRate;
+      if (discountPercent) accomPrice = accomPrice * (1 - discountPercent / 100);
+      var total = Math.round(COURSE_PRICES[courseVal][durationVal] + accomPrice);
+      qTotal.textContent = '€' + total.toLocaleString('en-US');
+      qTotal.classList.remove('placeholder');
+    } else {
+      qTotal.textContent = 'Select options above';
+      qTotal.classList.add('placeholder');
+    }
+
+    if (discountPercent) {
+      discountPercentEl.textContent = discountPercent + '%';
+      discountNote.style.display = 'flex';
+    } else {
+      discountNote.style.display = 'none';
+    }
+
+    if (durationVal) {
+      var stayNights = weeks * 7 + extraNights();
+      depositAmount.textContent = '€' + (stayNights <= 24 ? 350 : 500);
+      depositNote.style.display = 'flex';
+    } else {
+      depositNote.style.display = 'none';
+    }
+
+    updateAccomRangeDisplay();
+  }
+
+  /* Reusable calendar popup — used for both course start (Mondays only)
+     and accommodation move-in (locked to 1 or 2 days before course start). */
+  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var TODAY = new Date();
+  TODAY.setHours(0, 0, 0, 0);
+
+  function createCalendar(opts) {
+    var viewYear = TODAY.getFullYear();
+    var viewMonth = TODAY.getMonth();
+
+    function isSelectable(d) {
+      if (d < TODAY) return false;
+      if (opts.isAllowedFn) return opts.isAllowedFn(d);
+      if (opts.allowedWeekdays && opts.allowedWeekdays.indexOf(d.getDay()) === -1) return false;
+      return true;
+    }
+
+    function selectDate(date) {
+      opts.dayEl.value = date.getDate();
+      opts.monthEl.value = date.getMonth() + 1;
+      opts.yearEl.value = date.getFullYear();
+      opts.inputEl.value = WEEKDAY_SHORT[date.getDay()] + ', ' + MONTH_NAMES[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+      opts.popupEl.classList.remove('open');
+      if (opts.onSelect) opts.onSelect(date);
+    }
+
+    function render() {
+      opts.monthLabelEl.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+      opts.gridEl.innerHTML = '';
+      var firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+      var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+      for (var i = 0; i < firstWeekday; i++) {
+        var empty = document.createElement('span');
+        empty.className = 'cal-day empty';
+        opts.gridEl.appendChild(empty);
+      }
+      for (var d = 1; d <= daysInMonth; d++) {
+        var cellDate = new Date(viewYear, viewMonth, d);
+        var cell = document.createElement('span');
+        cell.className = 'cal-day';
+        cell.textContent = d;
+        if (isSelectable(cellDate)) {
+          cell.classList.add('enabled');
+          cell.addEventListener('click', (function (dd) { return function () { selectDate(dd); }; })(cellDate));
+        }
+        opts.gridEl.appendChild(cell);
+      }
+    }
+
+    opts.prevEl.addEventListener('click', function () {
+      viewMonth -= 1; if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; } render();
+    });
+    opts.nextEl.addEventListener('click', function () {
+      viewMonth += 1; if (viewMonth > 11) { viewMonth = 0; viewYear += 1; } render();
+    });
+    opts.inputEl.addEventListener('click', function () { opts.popupEl.classList.toggle('open'); });
+    document.addEventListener('click', function (e) {
+      if (!opts.groupEl.contains(e.target)) opts.popupEl.classList.remove('open');
+    });
+
+    render();
+
+    return {
+      setDate: function (date) { selectDate(date); },
+      jumpTo: function (date) { viewYear = date.getFullYear(); viewMonth = date.getMonth(); render(); }
+    };
+  }
+
+  /* Accommodation dates match the course: move-in is always 1 or 2 days
+     before the chosen course start date (e.g. Sat/Sun before a Monday). */
+  var accomStartInput = document.getElementById('accom-date-input');
+  var accomStartDayEl = document.getElementById('accom-start-day');
+  var accomStartMonthEl = document.getElementById('accom-start-month');
+  var accomStartYearEl = document.getElementById('accom-start-year');
+
+  var selectedCourseDate = null;
+  var accomOffsetDays = 1;
+
+  function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function accomAllowedDates() {
+    if (!selectedCourseDate) return [];
+    var oneBefore = new Date(selectedCourseDate);
+    oneBefore.setDate(oneBefore.getDate() - 1);
+    var twoBefore = new Date(selectedCourseDate);
+    twoBefore.setDate(twoBefore.getDate() - 2);
+    return [oneBefore, twoBefore];
+  }
+
+  function applyAccomDate() {
+    var target = accomAllowedDates()[accomOffsetDays - 1];
+    if (!target) return;
+    accomCal.setDate(target);
+    accomCal.jumpTo(target);
+  }
+
+  var accomCal = createCalendar({
+    groupEl: document.getElementById('accom-date-group'),
+    inputEl: accomStartInput,
+    popupEl: document.getElementById('accom-calendar-popup'),
+    gridEl: document.getElementById('accom-calendar-grid'),
+    monthLabelEl: document.getElementById('accom-cal-month-label'),
+    prevEl: document.getElementById('accom-cal-prev'),
+    nextEl: document.getElementById('accom-cal-next'),
+    dayEl: accomStartDayEl,
+    monthEl: accomStartMonthEl,
+    yearEl: accomStartYearEl,
+    isAllowedFn: function (d) {
+      return accomAllowedDates().some(function (a) { return sameDay(a, d); });
+    },
+    onSelect: function (date) {
+      var allowed = accomAllowedDates();
+      accomOffsetDays = (allowed[0] && sameDay(date, allowed[0])) ? 1 : 2;
+      updateAccomRangeDisplay();
+    }
+  });
+
+  var startDateInput = document.getElementById('start-date-input');
+
+  var courseCal = createCalendar({
+    groupEl: document.getElementById('start-date-group'),
+    inputEl: startDateInput,
+    popupEl: document.getElementById('calendar-popup'),
+    gridEl: document.getElementById('calendar-grid'),
+    monthLabelEl: document.getElementById('cal-month-label'),
+    prevEl: document.getElementById('cal-prev'),
+    nextEl: document.getElementById('cal-next'),
+    dayEl: document.getElementById('mce-STARTDATE-day'),
+    monthEl: document.getElementById('mce-STARTDATE-month'),
+    yearEl: document.getElementById('mce-STARTDATE-year'),
+    allowedWeekdays: [1],
+    onSelect: function (date) {
+      selectedCourseDate = date;
+      qStart.textContent = startDateInput.value || '—';
+      applyAccomDate();
+    }
+  });
+
+  courseSelect.addEventListener('change', updateQuote);
+  accomSelect.addEventListener('change', updateQuote);
+  durationSelect.addEventListener('change', updateQuote);
+  extraNightsInput.addEventListener('input', updateQuote);
+  updateQuote();
+
+  /* Page navigation */
+  var page1 = document.getElementById('page-1');
+  var page2 = document.getElementById('page-2');
+  var pageTitle = document.getElementById('page-title');
+  var ctaBtn = document.getElementById('cta-btn');
+  var backBtn = document.getElementById('back-btn');
+  var page1Error = document.getElementById('page1-error');
+
+  function goToPage2() {
+    var complete = courseSelect.value && levelSelect.value && durationSelect.value && accomSelect.value &&
+      document.getElementById('mce-STARTDATE-day').value && document.getElementById('accom-start-day').value;
+    if (!complete) {
+      page1Error.style.display = 'block';
+      return;
+    }
+    page1Error.style.display = 'none';
+    page1.style.display = 'none';
+    page2.style.display = 'block';
+    pageTitle.textContent = 'Your Details';
+    ctaBtn.textContent = 'Submit →';
+    ctaBtn.type = 'submit';
+  }
+
+  function goToPage1() {
+    page2.style.display = 'none';
+    page1.style.display = 'block';
+    pageTitle.textContent = 'Book Your Course';
+    ctaBtn.textContent = 'Next →';
+    ctaBtn.type = 'button';
+  }
+
+  ctaBtn.addEventListener('click', function () {
+    if (ctaBtn.type === 'button') goToPage2();
+  });
+  backBtn.addEventListener('click', goToPage1);
+</script>
+</body>
+</html>
