@@ -519,7 +519,7 @@
       <h2 class="title" id="page-title">Book Your Course</h2>
 
       <form
-        action="https://blaustudenthousing.us8.list-manage.com/subscribe/post?u=a508b1d7581df9dd34f531f2f&amp;id=01eba896ed&amp;v_id=3701&amp;f_id=00beeee2f0"
+        action="https://blaustudenthousing.us8.list-manage.com/subscribe/post?u=a508b1d7581df9dd34f531f2f&amp;id=01eba896ed&amp;v_id=3702&amp;f_id=00beeee2f0"
         method="post"
         id="mc-embedded-subscribe-form"
         name="mc-embedded-subscribe-form"
@@ -616,7 +616,7 @@
 
           <div class="mc-field-group">
             <label for="extra-nights-input">Extra Nights (optional)</label>
-            <input type="number" id="extra-nights-input" min="0" step="1" value="0" placeholder="0">
+            <input type="number" id="extra-nights-input" name="EXTRANIGHT" min="0" step="1" value="0" placeholder="0">
             <p class="calendar-hint" id="extra-nights-hint" style="text-align:left;">Select an accommodation to see the extra night rate</p>
           </div>
 
@@ -640,6 +640,11 @@
           <div class="mc-field-group">
             <label for="mce-EMAIL">Email Address <span class="asterisk">*</span></label>
             <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" required value="">
+          </div>
+
+          <div class="mc-field-group">
+            <label for="mce-PHONE">Phone Number</label>
+            <input type="text" name="PHONE" class="text" id="mce-PHONE" placeholder="Phone number" value="">
           </div>
 
           <div class="mc-field-group">
@@ -738,6 +743,12 @@
     fnames[5] = 'COUNTRY'; ftypes[5] = 'text';
     fnames[6] = 'STARTDATE'; ftypes[6] = 'date';
     fnames[8] = 'MMERGE8'; ftypes[8] = 'dropdown';
+    fnames[4] = 'PHONE'; ftypes[4] = 'phone';
+    fnames[9] = 'COURSE'; ftypes[9] = 'text';
+    fnames[10] = 'LEVEL'; ftypes[10] = 'text';
+    fnames[11] = 'ACCOM'; ftypes[11] = 'text';
+    fnames[12] = 'ACCOMSTART'; ftypes[12] = 'date';
+    fnames[13] = 'EXTRANIGHT'; ftypes[13] = 'text';
   })(typeof jQuery !== 'undefined' ? jQuery : function () { return { noConflict: function () {} }; });
 
   /* EDIT THESE when real course prices are ready. Duration keys must match
