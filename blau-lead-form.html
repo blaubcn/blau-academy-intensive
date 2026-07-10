@@ -86,6 +86,15 @@
     .field-row { grid-template-columns: 1fr; }
   }
 
+  .phone-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .phone-row { grid-template-columns: 1fr; }
+  }
+
   .mc-field-group {
     margin-bottom: 16px;
     position: relative;
@@ -256,6 +265,18 @@
     font-weight: 600;
     margin: 4px 0 0;
   }
+
+  .required-note {
+    background: #fdecf1;
+    border: 1.5px solid #f3c6d4;
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: #7a2f45;
+    line-height: 1.5;
+  }
+  .required-note strong { color: #c23b5a; }
 
   .back-btn {
     background: none;
@@ -512,6 +533,8 @@
 </head>
 <body>
 
+<iframe name="mc_hidden_iframe" title="Mailchimp submit target" style="display:none;"></iframe>
+
 <div class="booking-wrap">
   <div class="card">
     <div class="card-inner">
@@ -519,12 +542,12 @@
       <h2 class="title" id="page-title">Book Your Course</h2>
 
       <form
-        action="https://blaustudenthousing.us8.list-manage.com/subscribe/post?u=a508b1d7581df9dd34f531f2f&amp;id=01eba896ed&amp;v_id=3702&amp;f_id=00beeee2f0"
+        action="https://blaustudenthousing.us8.list-manage.com/subscribe/post?u=a508b1d7581df9dd34f531f2f&amp;id=01eba896ed&amp;v_id=3704&amp;f_id=00beeee2f0"
         method="post"
         id="mc-embedded-subscribe-form"
         name="mc-embedded-subscribe-form"
         class="validate"
-        target="_blank"
+        target="mc_hidden_iframe"
         novalidate
       >
         <div id="page-1" class="form-page">
@@ -532,7 +555,7 @@
 
           <div class="mc-field-group">
             <label for="course-select">Choose Course <span class="asterisk">*</span></label>
-            <select id="course-select" name="MMERGE_COURSE" required>
+            <select id="course-select" name="COURSE" required>
               <option value="" selected>Select a course…</option>
             </select>
           </div>
@@ -585,6 +608,10 @@
               <div class="calendar-grid" id="calendar-grid"></div>
               <p class="calendar-hint">Courses start every Monday</p>
             </div>
+          </div>
+
+          <div class="required-note">
+            <strong>Accommodation is required.</strong> This program does not offer course-only enrollment — please select your accommodation below.
           </div>
 
           <div class="mc-field-group">
@@ -643,8 +670,14 @@
           </div>
 
           <div class="mc-field-group">
-            <label for="mce-PHONE">Phone Number</label>
-            <input type="text" name="PHONE" class="text" id="mce-PHONE" placeholder="Phone number" value="">
+            <label for="phone-local-input">Phone Number <span class="asterisk">*</span></label>
+            <div class="phone-row">
+              <select id="phone-country-code" required>
+                <option value="" selected>Code…</option>
+              </select>
+              <input type="text" id="phone-local-input" placeholder="Phone number" required>
+            </div>
+            <input type="hidden" name="PHONE" id="mce-PHONE" value="">
           </div>
 
           <div class="mc-field-group">
@@ -656,10 +689,12 @@
             <p>Blau Language Academy will use the information you provide on this form to stay in touch with you and to send you information about our classes, events, and promotions.</p>
             <label for="gdpr_43744">
               <input type="checkbox" id="gdpr_43744" name="gdpr[43744]" class="gdpr required" value="Y">
-              <span>Email from Blau Language Academy <span class="asterisk">*</span></span>
+              <span>Email &amp; WhatsApp from Blau Language Academy <span class="asterisk">*</span></span>
             </label>
             <p style="margin:0;">You can unsubscribe at any time. See our <a href="https://blaustudenthousing.com/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>.</p>
           </div>
+
+          <p class="page1-error" id="page2-error" style="display:none;">Please complete all required fields above before submitting.</p>
 
           <button type="button" id="back-btn" class="back-btn">← Back</button>
 
@@ -698,6 +733,8 @@
       <p class="accom-details" id="accom-details"></p>
     </div>
     <div class="quote-row"><span>Accommodation Dates</span><strong id="q-accom-start">—</strong></div>
+    <div class="quote-row"><span>Course Price</span><strong id="q-course-price">—</strong></div>
+    <div class="quote-row"><span>Accommodation Price</span><strong id="q-accom-price">—</strong></div>
     <div class="quote-row quote-total"><span>Total</span><strong id="q-total" class="placeholder">Select options above</strong></div>
     <div class="discount-note" id="discount-note">
       <span>🎉</span>
@@ -757,19 +794,22 @@
   var COURSES = [
     { value: 'intensive-25h', label: '25h Intensive Course' }
   ];
+  /* Prices below already include the course's 20% discount and the
+     accommodation's 30% discount off list price — these are final,
+     charge-ready numbers, not pre-discount originals. */
   var COURSE_PRICES = {
     'intensive-25h': {
-      '1 Week': 345, '2 Weeks': 610, '3 Weeks': 875, '4 Weeks': 1140,
-      '5 Weeks': 1355, '6 Weeks': 1610, '7 Weeks': 1865, '8 Weeks': 2120,
-      '9 Weeks': 2375, '10 Weeks': 2630, '11 Weeks': 2885, '12 Weeks': 2900
+      '1 Week': 275, '2 Weeks': 518, '3 Weeks': 761, '4 Weeks': 1004,
+      '5 Weeks': 1247, '6 Weeks': 1490, '7 Weeks': 1733, '8 Weeks': 1976,
+      '9 Weeks': 2219, '10 Weeks': 2462, '11 Weeks': 2705, '12 Weeks': 2511
     }
   };
   var ACCOMMODATIONS = [
     {
       value: 'single-studio',
       label: 'Single Studio',
-      nightlyRate: 50,
-      extraNightRate: 80,
+      nightlyRate: 55,
+      extraNightRate: 88,
       photos: [
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-STUSIO-4x3-3.webp', caption: 'Room' },
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-STUSIO-4x3-5.webp', caption: 'Bathroom' },
@@ -783,8 +823,8 @@
     {
       value: 'comfort-studio',
       label: 'Comfort Studio',
-      nightlyRate: 52.5,
-      extraNightRate: 84,
+      nightlyRate: 57.75,
+      extraNightRate: 92.4,
       photos: [
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/Comfort-7.avif', caption: 'Room' },
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-ROOM-4x3-19.webp', caption: 'Bathroom' },
@@ -798,8 +838,8 @@
     {
       value: 'comfort-plus-studio',
       label: 'Comfort Plus Studio',
-      nightlyRate: 56.25,
-      extraNightRate: 90,
+      nightlyRate: 61.875,
+      extraNightRate: 99,
       photos: [
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2026/06/Render-Frontal-Cama.jpg', caption: 'Room' },
         { url: 'https://blaustudenthousing.com/wp-content/uploads/2025/04/SINGLE-ROOM-4x3-19.webp', caption: 'Bathroom' },
@@ -814,6 +854,92 @@
   /* EDIT: accommodation discount tiers, by minimum weeks booked.
      Use the admin.html page to edit these visually and generate this line. */
   var DISCOUNT_TIERS = [];
+
+  /* Country dial codes for the Phone Number field, so people don't forget
+     to include their country code. */
+  var COUNTRY_DIAL_CODES = [
+    { name: 'Spain', code: '+34' }, { name: 'Afghanistan', code: '+93' },
+    { name: 'Albania', code: '+355' }, { name: 'Algeria', code: '+213' },
+    { name: 'Andorra', code: '+376' }, { name: 'Angola', code: '+244' },
+    { name: 'Argentina', code: '+54' }, { name: 'Armenia', code: '+374' },
+    { name: 'Australia', code: '+61' }, { name: 'Austria', code: '+43' },
+    { name: 'Azerbaijan', code: '+994' }, { name: 'Bahamas', code: '+1' },
+    { name: 'Bahrain', code: '+973' }, { name: 'Bangladesh', code: '+880' },
+    { name: 'Belarus', code: '+375' }, { name: 'Belgium', code: '+32' },
+    { name: 'Belize', code: '+501' }, { name: 'Benin', code: '+229' },
+    { name: 'Bhutan', code: '+975' }, { name: 'Bolivia', code: '+591' },
+    { name: 'Bosnia and Herzegovina', code: '+387' }, { name: 'Botswana', code: '+267' },
+    { name: 'Brazil', code: '+55' }, { name: 'Brunei', code: '+673' },
+    { name: 'Bulgaria', code: '+359' }, { name: 'Burkina Faso', code: '+226' },
+    { name: 'Burundi', code: '+257' }, { name: 'Cambodia', code: '+855' },
+    { name: 'Cameroon', code: '+237' }, { name: 'Canada', code: '+1' },
+    { name: 'Cape Verde', code: '+238' }, { name: 'Chad', code: '+235' },
+    { name: 'Chile', code: '+56' }, { name: 'China', code: '+86' },
+    { name: 'Colombia', code: '+57' }, { name: 'Congo', code: '+242' },
+    { name: 'Costa Rica', code: '+506' }, { name: 'Croatia', code: '+385' },
+    { name: 'Cuba', code: '+53' }, { name: 'Cyprus', code: '+357' },
+    { name: 'Czech Republic', code: '+420' }, { name: 'Denmark', code: '+45' },
+    { name: 'Dominican Republic', code: '+1' }, { name: 'Ecuador', code: '+593' },
+    { name: 'Egypt', code: '+20' }, { name: 'El Salvador', code: '+503' },
+    { name: 'Estonia', code: '+372' }, { name: 'Ethiopia', code: '+251' },
+    { name: 'Fiji', code: '+679' }, { name: 'Finland', code: '+358' },
+    { name: 'France', code: '+33' }, { name: 'Gabon', code: '+241' },
+    { name: 'Gambia', code: '+220' }, { name: 'Georgia', code: '+995' },
+    { name: 'Germany', code: '+49' }, { name: 'Ghana', code: '+233' },
+    { name: 'Gibraltar', code: '+350' }, { name: 'Greece', code: '+30' },
+    { name: 'Guatemala', code: '+502' }, { name: 'Guinea', code: '+224' },
+    { name: 'Haiti', code: '+509' }, { name: 'Honduras', code: '+504' },
+    { name: 'Hong Kong', code: '+852' }, { name: 'Hungary', code: '+36' },
+    { name: 'Iceland', code: '+354' }, { name: 'India', code: '+91' },
+    { name: 'Indonesia', code: '+62' }, { name: 'Iran', code: '+98' },
+    { name: 'Iraq', code: '+964' }, { name: 'Ireland', code: '+353' },
+    { name: 'Israel', code: '+972' }, { name: 'Italy', code: '+39' },
+    { name: 'Jamaica', code: '+1' }, { name: 'Japan', code: '+81' },
+    { name: 'Jordan', code: '+962' }, { name: 'Kazakhstan', code: '+7' },
+    { name: 'Kenya', code: '+254' }, { name: 'Kuwait', code: '+965' },
+    { name: 'Kyrgyzstan', code: '+996' }, { name: 'Laos', code: '+856' },
+    { name: 'Latvia', code: '+371' }, { name: 'Lebanon', code: '+961' },
+    { name: 'Liberia', code: '+231' }, { name: 'Libya', code: '+218' },
+    { name: 'Liechtenstein', code: '+423' }, { name: 'Lithuania', code: '+370' },
+    { name: 'Luxembourg', code: '+352' }, { name: 'Macau', code: '+853' },
+    { name: 'Madagascar', code: '+261' }, { name: 'Malawi', code: '+265' },
+    { name: 'Malaysia', code: '+60' }, { name: 'Maldives', code: '+960' },
+    { name: 'Mali', code: '+223' }, { name: 'Malta', code: '+356' },
+    { name: 'Mauritius', code: '+230' }, { name: 'Mexico', code: '+52' },
+    { name: 'Moldova', code: '+373' }, { name: 'Monaco', code: '+377' },
+    { name: 'Mongolia', code: '+976' }, { name: 'Montenegro', code: '+382' },
+    { name: 'Morocco', code: '+212' }, { name: 'Mozambique', code: '+258' },
+    { name: 'Myanmar', code: '+95' }, { name: 'Namibia', code: '+264' },
+    { name: 'Nepal', code: '+977' }, { name: 'Netherlands', code: '+31' },
+    { name: 'New Zealand', code: '+64' }, { name: 'Nicaragua', code: '+505' },
+    { name: 'Niger', code: '+227' }, { name: 'Nigeria', code: '+234' },
+    { name: 'North Korea', code: '+850' }, { name: 'North Macedonia', code: '+389' },
+    { name: 'Norway', code: '+47' }, { name: 'Oman', code: '+968' },
+    { name: 'Pakistan', code: '+92' }, { name: 'Panama', code: '+507' },
+    { name: 'Papua New Guinea', code: '+675' }, { name: 'Paraguay', code: '+595' },
+    { name: 'Peru', code: '+51' }, { name: 'Philippines', code: '+63' },
+    { name: 'Poland', code: '+48' }, { name: 'Portugal', code: '+351' },
+    { name: 'Qatar', code: '+974' }, { name: 'Romania', code: '+40' },
+    { name: 'Russia', code: '+7' }, { name: 'Rwanda', code: '+250' },
+    { name: 'Saudi Arabia', code: '+966' }, { name: 'Senegal', code: '+221' },
+    { name: 'Serbia', code: '+381' }, { name: 'Singapore', code: '+65' },
+    { name: 'Slovakia', code: '+421' }, { name: 'Slovenia', code: '+386' },
+    { name: 'Somalia', code: '+252' }, { name: 'South Africa', code: '+27' },
+    { name: 'South Korea', code: '+82' }, { name: 'Sri Lanka', code: '+94' },
+    { name: 'Sudan', code: '+249' }, { name: 'Sweden', code: '+46' },
+    { name: 'Switzerland', code: '+41' }, { name: 'Syria', code: '+963' },
+    { name: 'Taiwan', code: '+886' }, { name: 'Tajikistan', code: '+992' },
+    { name: 'Tanzania', code: '+255' }, { name: 'Thailand', code: '+66' },
+    { name: 'Togo', code: '+228' }, { name: 'Trinidad and Tobago', code: '+1' },
+    { name: 'Tunisia', code: '+216' }, { name: 'Turkey', code: '+90' },
+    { name: 'Turkmenistan', code: '+993' }, { name: 'Uganda', code: '+256' },
+    { name: 'Ukraine', code: '+380' }, { name: 'United Arab Emirates', code: '+971' },
+    { name: 'United Kingdom', code: '+44' }, { name: 'United States', code: '+1' },
+    { name: 'Uruguay', code: '+598' }, { name: 'Uzbekistan', code: '+998' },
+    { name: 'Venezuela', code: '+58' }, { name: 'Vietnam', code: '+84' },
+    { name: 'Yemen', code: '+967' }, { name: 'Zambia', code: '+260' },
+    { name: 'Zimbabwe', code: '+263' }
+  ];
 
   function weeksFromDuration(durationVal) {
     return parseInt(durationVal, 10) || 0;
@@ -860,11 +986,30 @@
     accomSelect.appendChild(opt);
   });
 
+  var phoneCountrySelect = document.getElementById('phone-country-code');
+  var phoneLocalInput = document.getElementById('phone-local-input');
+  var phoneHiddenInput = document.getElementById('mce-PHONE');
+  COUNTRY_DIAL_CODES.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.code;
+    opt.textContent = c.name + ' ' + c.code;
+    phoneCountrySelect.appendChild(opt);
+  });
+  function updatePhoneValue() {
+    var code = phoneCountrySelect.value;
+    var local = phoneLocalInput.value.trim();
+    phoneHiddenInput.value = code && local ? code + ' ' + local : '';
+  }
+  phoneCountrySelect.addEventListener('change', updatePhoneValue);
+  phoneLocalInput.addEventListener('input', updatePhoneValue);
+
   var qCourse = document.getElementById('q-course');
   var qDuration = document.getElementById('q-duration');
   var qStart = document.getElementById('q-start');
   var qAccom = document.getElementById('q-accom');
   var qAccomStart = document.getElementById('q-accom-start');
+  var qCoursePrice = document.getElementById('q-course-price');
+  var qAccomPrice = document.getElementById('q-accom-price');
   var qTotal = document.getElementById('q-total');
   var discountNote = document.getElementById('discount-note');
   var discountPercentEl = document.getElementById('discount-percent');
@@ -935,10 +1080,19 @@
     var weeks = weeksFromDuration(durationVal);
     var discountPercent = accomVal ? bestDiscountPercent(weeks) : 0;
 
-    if (courseVal && accomVal && durationVal) {
-      var accomPrice = weeks * 7 * accom.nightlyRate + extraNights() * accom.extraNightRate;
+    var coursePrice = (courseVal && durationVal) ? COURSE_PRICES[courseVal][durationVal] : null;
+    qCoursePrice.textContent = coursePrice !== null ? '€' + coursePrice.toLocaleString('en-US') : '—';
+
+    var accomPrice = null;
+    if (accomVal && durationVal) {
+      accomPrice = weeks * 7 * accom.nightlyRate + extraNights() * accom.extraNightRate;
       if (discountPercent) accomPrice = accomPrice * (1 - discountPercent / 100);
-      var total = Math.round(COURSE_PRICES[courseVal][durationVal] + accomPrice);
+      accomPrice = Math.round(accomPrice);
+    }
+    qAccomPrice.textContent = accomPrice !== null ? '€' + accomPrice.toLocaleString('en-US') : '—';
+
+    if (coursePrice !== null && accomPrice !== null) {
+      var total = coursePrice + accomPrice;
       qTotal.textContent = '€' + total.toLocaleString('en-US');
       qTotal.classList.remove('placeholder');
     } else {
@@ -970,6 +1124,12 @@
   var WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   var TODAY = new Date();
   TODAY.setHours(0, 0, 0, 0);
+  var MAX_ENROLL_DATE = new Date(TODAY.getFullYear(), 11, 31);
+  MAX_ENROLL_DATE.setHours(0, 0, 0, 0);
+  /* Enrollment opens the last Monday of July (courses only start Mondays). */
+  var MIN_ENROLL_DATE = new Date(TODAY.getFullYear(), 6, 31);
+  while (MIN_ENROLL_DATE.getDay() !== 1) MIN_ENROLL_DATE.setDate(MIN_ENROLL_DATE.getDate() - 1);
+  MIN_ENROLL_DATE.setHours(0, 0, 0, 0);
 
   function createCalendar(opts) {
     var viewYear = TODAY.getFullYear();
@@ -977,6 +1137,8 @@
 
     function isSelectable(d) {
       if (d < TODAY) return false;
+      if (opts.minDate && d < opts.minDate) return false;
+      if (opts.maxDate && d > opts.maxDate) return false;
       if (opts.isAllowedFn) return opts.isAllowedFn(d);
       if (opts.allowedWeekdays && opts.allowedWeekdays.indexOf(d.getDay()) === -1) return false;
       return true;
@@ -1099,6 +1261,8 @@
     monthEl: document.getElementById('mce-STARTDATE-month'),
     yearEl: document.getElementById('mce-STARTDATE-year'),
     allowedWeekdays: [1],
+    minDate: MIN_ENROLL_DATE,
+    maxDate: MAX_ENROLL_DATE,
     onSelect: function (date) {
       selectedCourseDate = date;
       qStart.textContent = startDateInput.value || '—';
@@ -1143,10 +1307,72 @@
     ctaBtn.type = 'button';
   }
 
-  ctaBtn.addEventListener('click', function () {
-    if (ctaBtn.type === 'button') goToPage2();
+  ctaBtn.addEventListener('click', function (e) {
+    if (ctaBtn.type === 'button') {
+      /* Without this, goToPage2() flipping ctaBtn.type to 'submit' mid-click
+         makes the browser treat THIS SAME click as a form submission too,
+         skipping page 2 entirely. preventDefault() stops that. */
+      e.preventDefault();
+      goToPage2();
+    }
   });
   backBtn.addEventListener('click', goToPage1);
+
+  var page2Error = document.getElementById('page2-error');
+
+  /* The form has novalidate, so the browser's own required-field enforcement
+     never kicks in — this is the only thing actually blocking submission of
+     an incomplete page 2. Registered before the redirect listener below so
+     stopImmediatePropagation() can cancel it when validation fails. */
+  document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function (e) {
+    updatePhoneValue();
+    var complete = document.getElementById('mce-FNAME').value.trim() &&
+      document.getElementById('mce-LNAME').value.trim() &&
+      document.getElementById('mce-EMAIL').value.trim() &&
+      document.getElementById('mce-COUNTRY').value.trim() &&
+      phoneCountrySelect.value && phoneLocalInput.value.trim() &&
+      document.getElementById('gdpr_43744').checked;
+    if (!complete) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      page2Error.style.display = 'block';
+    } else {
+      page2Error.style.display = 'none';
+    }
+  });
+
+  /* On real submit, send the visitor to the real Wix thank-you page.
+     The form now posts to a hidden iframe (mc_hidden_iframe) instead of
+     target="_blank", so Mailchimp's own plain response never opens a
+     visible tab — the visitor only ever sees our branded pages. This form
+     lives inside a Wix popup, which may run it in a sandboxed embed, so we
+     try to redirect the whole browser tab (window.top) and fall back to
+     redirecting just this frame if the sandbox blocks that. We forward UTM
+     params (if the visitor arrived via a tracked ad) plus a few fields in
+     case the Wix page ever wants to read them from the URL. */
+  document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function () {
+    var incoming = new URLSearchParams(window.location.search);
+    var redirectParams = new URLSearchParams();
+
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (key) {
+      var val = incoming.get(key);
+      if (val) redirectParams.set(key, val);
+    });
+
+    redirectParams.set('fname', document.getElementById('mce-FNAME').value || '');
+    redirectParams.set('course', qCourse.textContent !== '—' ? qCourse.textContent : '');
+    redirectParams.set('level', levelSelect.value || '');
+    redirectParams.set('duration', durationSelect.value || '');
+    redirectParams.set('start', qStart.textContent !== '—' ? qStart.textContent : '');
+    redirectParams.set('accom', qAccom.textContent !== '—' ? qAccom.textContent : '');
+
+    var redirectUrl = 'https://blau-language.com/thank-you?' + redirectParams.toString();
+    try {
+      window.top.location.href = redirectUrl;
+    } catch (e) {
+      window.location.href = redirectUrl;
+    }
+  });
 </script>
 </body>
 </html>
