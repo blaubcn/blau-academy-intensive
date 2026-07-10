@@ -530,6 +530,10 @@
     transition: background 0.15s ease;
   }
   .quote-cta:hover { background: var(--navy-dark); }
+  .quote-cta:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -1373,12 +1377,20 @@
      target="_blank", so Mailchimp's own plain response never opens a
      visible tab — the visitor only ever sees our branded pages. That POST
      is a background request that takes a moment to complete, so we wait
-     for the hidden iframe to finish loading (with a timeout fallback in
-     case it never fires) before navigating — navigating immediately would
-     tear down the page mid-submission and the POST would never reach
-     Mailchimp. We forward UTM params (if the visitor arrived via a
-     tracked ad) plus a few fields in case the Wix page wants to read them. */
+     a fixed delay before navigating — navigating immediately would tear
+     down the page mid-submission and the POST would never reach Mailchimp.
+     (We used to also race this against the iframe's 'load' event as a
+     fast path, but that event fires as soon as the iframe *starts*
+     navigating, not once Mailchimp has actually received the POST body —
+     testing showed it firing before the submission reached Mailchimp, so
+     the fixed delay is now the only trigger, generous enough to cover
+     Mailchimp's real response time.) We forward UTM params (if the
+     visitor arrived via a tracked ad) plus a few fields in case the Wix
+     page wants to read them. */
   document.getElementById('mc-embedded-subscribe-form').addEventListener('submit', function () {
+    ctaBtn.disabled = true;
+    ctaBtn.textContent = 'Submitting…';
+
     var incoming = new URLSearchParams(window.location.search);
     var redirectParams = new URLSearchParams();
 
@@ -1396,14 +1408,7 @@
 
     var redirectUrl = 'https://blau-language.com/thank-you?' + redirectParams.toString();
 
-    var navigated = false;
-    function goToThankYou() {
-      if (navigated) return;
-      navigated = true;
-      window.location.href = redirectUrl;
-    }
-    document.querySelector('iframe[name="mc_hidden_iframe"]').addEventListener('load', goToThankYou, { once: true });
-    setTimeout(goToThankYou, 2000);
+    setTimeout(function () { window.location.href = redirectUrl; }, 3000);
   });
 </script>
 </body>
