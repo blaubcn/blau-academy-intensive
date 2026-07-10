@@ -20,12 +20,7 @@
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: var(--blue-bg);
-    background-image:
-      radial-gradient(rgba(255,255,255,0.55) 1.5px, transparent 1.5px),
-      radial-gradient(rgba(255,255,255,0.35) 1.5px, transparent 1.5px);
-    background-size: 26px 26px, 26px 26px;
-    background-position: 0 0, 13px 13px;
+    background: transparent;
     min-height: 100vh;
     padding: 40px 16px;
   }
@@ -326,6 +321,12 @@
     color: var(--navy);
     font-weight: 700;
     text-align: right;
+  }
+  .price-original {
+    text-decoration: line-through;
+    color: #9aa2bb;
+    font-weight: 600;
+    margin-right: 6px;
   }
   .quote-total {
     border-bottom: none;
@@ -733,9 +734,9 @@
       <p class="accom-details" id="accom-details"></p>
     </div>
     <div class="quote-row"><span>Accommodation Dates</span><strong id="q-accom-start">—</strong></div>
-    <div class="quote-row"><span>Course Price</span><strong id="q-course-price">—</strong></div>
-    <div class="quote-row"><span>Accommodation Price</span><strong id="q-accom-price">—</strong></div>
-    <div class="quote-row quote-total"><span>Total</span><strong id="q-total" class="placeholder">Select options above</strong></div>
+    <div class="quote-row"><span>Course Price</span><strong><span class="price-original" id="q-course-price-original"></span><span id="q-course-price">—</span></strong></div>
+    <div class="quote-row"><span>Accommodation Price</span><strong><span class="price-original" id="q-accom-price-original"></span><span id="q-accom-price">—</span></strong></div>
+    <div class="quote-row quote-total"><span>Total</span><strong id="q-total-wrap" class="placeholder"><span class="price-original" id="q-total-original"></span><span id="q-total">Select options above</span></strong></div>
     <div class="discount-note" id="discount-note">
       <span>🎉</span>
       <span><strong id="discount-percent">—</strong> long-stay discount applied</span>
@@ -804,6 +805,20 @@
       '9 Weeks': 2219, '10 Weeks': 2462, '11 Weeks': 2705, '12 Weeks': 2511
     }
   };
+  /* Pre-discount list prices (not a formula off COURSE_PRICES — the source
+     pricing table's discounted numbers don't reduce cleanly to a round %
+     off these, so both tables are kept literal to match the source exactly). */
+  var COURSE_PRICES_ORIGINAL = {
+    'intensive-25h': {
+      '1 Week': 330, '2 Weeks': 622, '3 Weeks': 913, '4 Weeks': 1205,
+      '5 Weeks': 1496, '6 Weeks': 1788, '7 Weeks': 2080, '8 Weeks': 2371,
+      '9 Weeks': 2663, '10 Weeks': 2954, '11 Weeks': 3246, '12 Weeks': 3013
+    }
+  };
+  /* Accommodation's 30% discount off list price. Unlike course, this one
+     does divide back cleanly (nightlyRate values were derived from list
+     price × 0.7), so the original is computed rather than duplicated. */
+  var ACCOM_DISCOUNT = 0.3;
   var ACCOMMODATIONS = [
     {
       value: 'single-studio',
@@ -1009,8 +1024,12 @@
   var qAccom = document.getElementById('q-accom');
   var qAccomStart = document.getElementById('q-accom-start');
   var qCoursePrice = document.getElementById('q-course-price');
+  var qCoursePriceOriginal = document.getElementById('q-course-price-original');
   var qAccomPrice = document.getElementById('q-accom-price');
+  var qAccomPriceOriginal = document.getElementById('q-accom-price-original');
   var qTotal = document.getElementById('q-total');
+  var qTotalOriginal = document.getElementById('q-total-original');
+  var qTotalWrap = document.getElementById('q-total-wrap');
   var discountNote = document.getElementById('discount-note');
   var discountPercentEl = document.getElementById('discount-percent');
   var depositNote = document.getElementById('deposit-note');
@@ -1081,23 +1100,31 @@
     var discountPercent = accomVal ? bestDiscountPercent(weeks) : 0;
 
     var coursePrice = (courseVal && durationVal) ? COURSE_PRICES[courseVal][durationVal] : null;
+    var coursePriceOriginal = (courseVal && durationVal) ? COURSE_PRICES_ORIGINAL[courseVal][durationVal] : null;
     qCoursePrice.textContent = coursePrice !== null ? '€' + coursePrice.toLocaleString('en-US') : '—';
+    qCoursePriceOriginal.textContent = coursePriceOriginal !== null ? '€' + coursePriceOriginal.toLocaleString('en-US') : '';
 
     var accomPrice = null;
+    var accomPriceOriginal = null;
     if (accomVal && durationVal) {
-      accomPrice = weeks * 7 * accom.nightlyRate + extraNights() * accom.extraNightRate;
-      if (discountPercent) accomPrice = accomPrice * (1 - discountPercent / 100);
+      var accomPriceBeforeLongStay = weeks * 7 * accom.nightlyRate + extraNights() * accom.extraNightRate;
+      accomPriceOriginal = Math.round(accomPriceBeforeLongStay / (1 - ACCOM_DISCOUNT));
+      accomPrice = discountPercent ? accomPriceBeforeLongStay * (1 - discountPercent / 100) : accomPriceBeforeLongStay;
       accomPrice = Math.round(accomPrice);
     }
     qAccomPrice.textContent = accomPrice !== null ? '€' + accomPrice.toLocaleString('en-US') : '—';
+    qAccomPriceOriginal.textContent = accomPriceOriginal !== null ? '€' + accomPriceOriginal.toLocaleString('en-US') : '';
 
     if (coursePrice !== null && accomPrice !== null) {
       var total = coursePrice + accomPrice;
+      var totalOriginal = coursePriceOriginal + accomPriceOriginal;
       qTotal.textContent = '€' + total.toLocaleString('en-US');
-      qTotal.classList.remove('placeholder');
+      qTotalOriginal.textContent = '€' + totalOriginal.toLocaleString('en-US');
+      qTotalWrap.classList.remove('placeholder');
     } else {
       qTotal.textContent = 'Select options above';
-      qTotal.classList.add('placeholder');
+      qTotalOriginal.textContent = '';
+      qTotalWrap.classList.add('placeholder');
     }
 
     if (discountPercent) {
