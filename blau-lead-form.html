@@ -1394,10 +1394,24 @@
     redirectParams.set('accom', qAccom.textContent !== '—' ? qAccom.textContent : '');
 
     var redirectUrl = 'https://blau-language.com/thank-you?' + redirectParams.toString();
+
+    /* Some sandboxed embeds (Wix popups likely among them) only allow
+       top-level navigation when it's triggered by an actual click, not a
+       script property assignment. A simulated anchor click with
+       target="_top" counts as that kind of gesture, so try it first. */
     try {
-      window.top.location.href = redirectUrl;
+      var topLink = document.createElement('a');
+      topLink.href = redirectUrl;
+      topLink.target = '_top';
+      document.body.appendChild(topLink);
+      topLink.click();
+      topLink.remove();
     } catch (e) {
-      window.location.href = redirectUrl;
+      try {
+        window.top.location.href = redirectUrl;
+      } catch (e2) {
+        window.location.href = redirectUrl;
+      }
     }
   });
 </script>
